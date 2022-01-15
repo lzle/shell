@@ -17,11 +17,13 @@ Shell 是一个用 C 语言编写的程序，它是用户使用 Linux 的桥梁�
 
 六、[运算符](#六运算符)
 
-七、[输入/输出重定向](#七输入输出重定向)
+七、[用户参数](#七用户参数)
 
-八、[eval 函数](#八eval-函数)
+八、[输入/输出重定向](#七输入输出重定向)
 
 九、[数学运算](#九数学运算)
+
+十、[控制脚本](#十控制脚本)
 
 ## 一、变量
 
@@ -29,7 +31,7 @@ Shell 是一个用 C 语言编写的程序，它是用户使用 Linux 的桥梁�
 
 ### 1、 赋值
 
-`Shell` 定义变量时，变量名不加美元符号，如：
+`shell` 定义变量时，变量名不加美元符号，如：
 
 ```shell
 $ content="hello world"
@@ -252,7 +254,6 @@ fi
 
 # true
 ```
-
 
 ## 三、数组
 
@@ -753,34 +754,79 @@ done | sort
 
 ### 1、 函数定义
 
-`Shell` 中可以用户定义函数，然后在 `shell` 脚本中可以随便调用。
+有两种格式可以用来在 `shell` 脚本中创建函数。第一种格式采用关键字 `function`，后跟分配给该代码块的函数名。
+
+```shell
+function name { 
+    commands 
+}
+```
+第二种格式更接近于其他编程语言中定义函数的方式,函数名后的空括号表明正在定义的是一个函数。
+
+```shell
+name() { 
+    commands 
+}
+```
 
 下面的例子定义了一个函数并进行调用：
 
 ```shell
+$ cat test.sh
 #!/bin/bash
 
 function demo(){
-     echo "这是我的第一个 shell 函数!"
+    echo "这是我的第一个 shell 函数!"
 }
 echo "-----函数开始执行-----"
 demo
 echo "-----函数执行完毕-----"
-```
 
-可以带 `function fun()` 定义，也可以直接 `fun()` 定义,不带任何参数。
-
-参数返回，可以显示加：`return` 返回，如果不加，将以最后一条命令运行结果，作为返回值。 `return` 后跟数值n(0-255)。
-
-函数脚本执行结果：
-
-```shell
+$ sh test.sh
 -----函数开始执行-----
 这是我的第一个 shell 函数!
 -----函数执行完毕-----
 ```
+### 2、 返回值
 
-### 2、 函数参数
+获取函数的返回值，可以显示加：`return` 返回，如果不加，将以最后一条命令运行结果，执行状态码作为返回值。 `return` 后跟数值 n(0-255)。
+
+
+```shell
+$ cat test.sh
+#!/bin/bash
+
+function test {
+    read -p "enter a value: " value
+    return $[ $value * $value ]
+}
+test
+echo "the new value is $?"
+
+$ sh test.sh
+enter a value: 10
+the new value is 100
+```
+
+还可以使用函数输出获取函数执行结果，这种方式返回值可以是任何类型。
+
+```shell
+$ cat test.sh
+#!/bin/bash
+
+function test {
+    read -p "enter a value: " value
+    echo $[ $value * $value ]
+}
+result=$(test)
+echo "the new value is $result"
+
+$ sh test.sh
+enter a value: 100
+the new value is 10000
+```
+
+### 3、 函数传参
 
 在 `shell` 中，调用函数时可以向其传递参数。在函数体内部，通过 $n 的形式来获取参数的值，例如，$1 表示第一个参数，$2 表示第二个参数...
 
@@ -798,17 +844,13 @@ function param(){
      echo "作为一个字符串输出所有参数 $* !"
 }
 param 11 22 3 4 5 6 7 8 9 34 73
-```
 
-输出结果：
-
-```shell
-第一个参数为 11 !
-第十个参数为 110 !
-第十个参数为 34 !
-第十一个参数为 73 !
-参数总数有 11 个!
-作为一个字符串输出所有参数 11 22 3 4 5 6 7 8 9 34 73 !
+# 第一个参数为 11 !
+# 第十个参数为 110 !
+# 第十个参数为 34 !
+# 第十一个参数为 73 !
+# 参数总数有 11 个!
+# 作为一个字符串输出所有参数 11 22 3 4 5 6 7 8 9 34 73 !
 ```
 
 参数获取时 `$n` 与 `${n}` 还是有区别的，特别是第二行的打印。
@@ -827,23 +869,130 @@ $-	显示Shell使用的当前选项，与set命令功能相同。
 $?	显示最后命令的退出状态。0表示没有错误，其他任何值表明有错误。
 ```
 
-### 3、 获取函数结果
+### 4、 函数变量
 
-获取函数的执行结果。
+默认情况下，在脚本中定义的任何变量都是全局变量，在函数外定义的变量可在函数内正常访问，**对值进行修改后，会影响全局变量的值**。
 
 ```shell
 #!/bin/bash
 
-function get_hostname(){
-    echo "$(hostname)"
+count=1
+function test {
+    count=2
 }
+test
+echo $count
 
-hostname=$(get_hostname)
-echo $hostname
-
-# localhost
+# 2
 ```
 
+要想在函数内部对变量值修改，不影响函数外的调用。可以在函数内部把变量声明为局部变量，只需在变量声明前加 `local` 即可。
+
+```shell
+#!/bin/bash
+
+count=1
+function test {
+    local count=2
+}
+test
+echo $count
+
+# 1
+```
+
+### 5、数组变量和函数
+
+把数组做个函数的参数传参，如果将该数组变量作为函数参数，函数只会取数组变量的第一个值。
+必须将该数组变量的值分解成单个的值。
+
+```shell
+#!/bin/bash
+
+function test {
+    echo $@
+}
+array=(1 2 3 4 5)
+test $array
+test ${array[@]}
+
+# 1
+# 1 2 3 4 5
+```
+
+将数组作为返回值。
+
+```shell
+#!/bin/bash
+
+function test {
+   newarray=($(echo "$@"))
+   elements=$[ $# - 1 ]
+   for (( i = 0; i <= $elements; i++ ))
+   {
+      newarray[$i]=$[ ${newarray[$i]} * 2 ]
+   }
+   echo ${newarray[*]}
+}
+array=(1 2 3 4 5)
+result=$(test ${array[@]})
+echo ${result[@]}
+
+# 2 4 6 8 10
+```
+
+### 6、函数递归
+
+使用函数递归调用的特性实现阶乘算法。
+
+```shell
+#!/bin/bash
+
+function factorial {
+ if [ $1 -eq 1 ];then
+    echo 1
+ else
+    local temp=$[ $1 - 1 ]
+    local result=$(factorial $temp)
+    echo $[ $result * $1 ]
+ fi
+}
+result=$(factorial 5)
+echo $result
+
+# 120
+```
+
+### 7、创建库
+
+一个脚本可以调用其他脚本中的函数，被调用的脚本作为公共库文件。
+
+```shell
+$ cat myfuncs
+#!/bin/bash
+
+function addem { 
+ echo $[ $1 + $2 ] 
+}
+```
+
+使用函数库的关键在于 `source` 命令。`source` 命令会在当前 `shell` 上下文中执行命令，而不是创建一个新 `shell`。
+可以用 `source` 命令来在 `shell` 脚本中运行库文件脚本。这样脚本就可以使用库中的函数了。
+
+`source` 命令有个快捷的别名，称作点操作符（dot operator）。
+
+```shell
+$ cat test.sh
+#!/bin/bash 
+
+. ./myfuncs 
+value1=10 
+value2=5 
+result=$(addem $value1 $value2)
+echo $result
+
+# 15
+```
 
 ## 六、运算符
 
@@ -1047,8 +1196,227 @@ fi
 # 返回 true
 ```
 
+## 七、用户参数
 
-## 七、输入/输出重定向
+`bash shell` 提供了一些不同的方法来从用户处获得数据，包括命令行参数、命令行选项以及直接从键盘读取输入的能力。
+
+### 1、命令行参数
+
+传递数据的最基本方法是使用命令行参数，通过位置参数可以获取传入的参数值。
+
+位置参数变量是标准的数字：`$0` 是程序名，`$1` 是第一个参数，`$2` 是第二个参数，依次类推，直到第九个参数 `$9`。
+
+```shell
+$ cat test.sh
+#!/bin/bash
+
+echo $0
+echo $1
+
+$ sh test.sh 100
+
+test.sh
+100
+```
+
+每个参数都是用空格分隔的，所以 `shell` 会将空格当成两个值的分隔符。要在参数值中包含空格，必须要用引号。
+
+当传给 `$0` 变量是完整的脚本路径时， 变量 `$0` 就会使用整个路径。此时可以使用 `basename` 命令，
+它会返回不包含路径的脚本名。
+
+```shell
+$ cat test.sh
+#!/bin/bash 
+
+name=$(basename $0) 
+echo 
+echo The script name is: $name
+
+$ sh /root/test.sh
+
+test.sh
+```
+
+当命令行参数不止 9 个时，可以在变量数字周围加上花括号，比如 `${10}` 来获取。
+
+特殊变量 `$#` 可以获取参数的数量，`${!#}` 可以获取最后一个参数。
+
+`$*` 和 `$@` 变量可以用来轻松访问所有的参数。`$*` 变量会将命令行上提供的所有参数当作一个单词保存。
+`$@` 变量会将命令行上提供的所有参数当作同一字符串中的多个独立的单词。
+
+```shell
+#!/bin/bash
+
+for param in "$*"
+do
+    echo $param
+done
+
+echo 
+
+for param in "$@"
+do
+    echo $param
+done
+
+$ ./test.sh rich barbara katie jessica
+rich barbara katie jessica
+
+rich
+barbara
+katie
+jessica
+```
+
+
+### 2、移动变量
+
+`shift` 命令会根据它们的相对位置来移动命令行参数，默认情况下它会将每个参数变量向左移动一个位置。
+
+这是遍历命令行参数的另一个好方法，尤其是在你不知道到底有多少参数时。
+
+```shell
+$ cat test.sh
+#!/bin/bash
+
+while [ -n "$1" ]
+do
+    echo $1
+    shift
+done
+
+$ ./test.sh rich barbara katie jessica
+
+rich
+barbara
+katie
+jessica
+```
+
+`shift` 后还可以跟参数，指明移动的位置。例如 `shift 2` 表示移动两位。
+
+### 3、处理选项
+
+`getopt` 命令可以接受一系列任意形式的命令行选项和参数，并自动将它们转换成适当的格
+式。它的命令格式如下：
+
+```shell
+getopt optstring parameters
+```
+
+在 optstring 中列出你要在脚本中用到的每个命令行选项字母。然后，在每个需要参数值的选项字母后加一个冒号。
+
+```shell
+$ getopt ab:cd -a -b test1 -cd test2 test3
+-a -b test1 -c -d -- test2 test3
+```
+
+如果指定了一个不在 optstring 中的选项，会产生错误消息，可以使用 -q 参数进行忽略。
+
+`getopts` 命令相比 `getopt` 多了很多扩展功能，命令格式如下：
+
+```shell
+getopts optstring variable
+```
+
+`getopts` 命令会用到两个环境变量。如果选项需要跟一个参数值，`OPTARG` 环境变量就会保存这个值。
+`OPTIND` 环境变量保存了参数列表中 `getopts` 正在处理的参数位置。
+
+```shell
+$ cat test.sh
+#!/bin/bash 
+ 
+while getopts :ab:cd opt 
+do 
+    case "$opt" in 
+    a) echo "found the -a option, with value $OPTARG" ;; 
+    b) echo "found the -b option, with value $OPTARG" ;; 
+    c) echo "found the -c option, with value $OPTARG" ;; 
+    d) echo "found the -d option, with value $OPTARG" ;; 
+    *) echo "Unknown option: $opt" ;; 
+    esac 
+done 
+
+shift $[ $OPTIND - 1 ] 
+
+echo 
+for param in "$@" 
+do 
+ echo $param
+done
+
+$ Shell sh t.sh  -a -b test1 -d test2 test3 test4
+found the -a option, with value
+found the -b option, with value test1
+found the -d option, with value
+
+test2
+test3
+```
+
+Linux 中用到的一些命令行选项的常用含义。
+
+|选 项|描 述|
+|---|---
+|-a |显示所有对象
+|-c |生成一个计数
+|-d |指定一个目录
+|-e |扩展一个对象
+|-f |指定读入数据的文件
+|-h |显示命令的帮助信息
+|-i |忽略文本大小写
+|-l |产生输出的长格式版本
+|-n |使用非交互模式（批处理）
+|-o |将所有输出重定向到的指定的输出文件
+|-q |以安静模式运行
+|-r |递归地处理目录和文件
+|-s |以安静模式运行
+|-v |生成详细输出
+|-x |排除某个对象
+|-y |对所有问题回答yes
+
+### 4、获取用户输入
+
+`read` 命令包含了 -p 选项，允许你直接在 `read` 命令行指定提示符。
+
+```shell
+$ cat test.sh
+#!/bin/bash 
+
+read -p "please enter your age: " age 
+days=$[ $age * 365 ] 
+echo "that makes you over $days days old! " 
+
+$ ./test.sh
+please enter your age: 10
+that makes you over 3650 days old!
+```
+
+设置超时，-t 选项指定了 `read` 命令等待输入的秒数。当计时器过期后，`read` 命令会返回一个非零退出状态码。
+
+隐藏方式读取，-s 选项可以避免在read命令中输入的数据出现在显示器上（实际上，数据会被显示，只是
+read 命令会将文本颜色设成跟背景色一样）。
+
+```shell
+$ cat test.sh
+#!/bin/bash 
+
+read -s -p "enter your password: " pass
+echo 
+echo "is your password really $pass? " 
+$ 
+$ ./test.sh
+enter your password: 
+is your password really T3st1ng?
+```
+
+`read` 还可以从文件中读取数据，常用的命令如下。
+
+```shell
+$ cat test | while read line; do echo $line; done
+```
+
+## 八、输入/输出重定向
 
 ### 1、 输出重定向
 
@@ -1120,67 +1488,6 @@ $ command < file1 >file2
 ```
 
 command 命令将 stdin 重定向到 file1，将 stdout 重定向到 file2。
-
-
-## 八、eval 函数
-
-当我们在命令行前加上 `eval` 时，`shell` 就会在执行命令之前扫描它两次。`eval` 命令将首先会先扫描命令行进行所有的置换，然后再执行该命令。该命令适用于那些一次扫描无法实现其功能的变量。该命令对变量进行两次扫描。
-
-常见的使用场景如下：
-
-### 1、普通情况
-
-```shell
-$ var=100
-$ echo $var
-100
-$ eval echo $var
-```
-
-这样和普通的没有加 `eval` 关键字的命令的作用一样。
-
-### 2、字符串转换命令
-
-```shell
-$ cat file
-helle shell
-it is a test of eval
-
-$ tfile="cat file"
-$ eval $tfile
-helle shell
-it is a test of eval
-```
-
-从上面可以看出 eval 经历了两次扫描，第一次扫描替换了变量为字符串，第二次扫描执行了字符串内容。
-
-### 3、获取参数
-
-```shell
-$ cat t.sh
-#!/bin/bash
-
-eval echo \$$#
-
-$ ./t.sh a b c
-c
-$ ./t.sh 1 2 3
-3
-```
-
-通过转义符 “|” 与 $# 结合，可以动态的获取最后一个参数。
-
-### 4、 修改指针
-
-```shell
-$ var=100
-$ ptr=var
-$ eval echo \$$ptr
-100
-$ eval $ptr=50
-$ echo $val
-50
-```
 
 ## 九、数学运算
 
@@ -1322,8 +1629,121 @@ echo The final answer for this mess is $var5
 # The final answer for this mess is 2813.9882
 ```
 
+## 十、控制脚本
 
-***
+### 1、处理信号
+
+Linux 系统和应用程序可以生成超过 30 个信号。下面列出了在 Linux 编程时会遇到的最常见的系统信号。
+
+|信 号|值|描 述|
+|---|---|---
+|1 |SIGHUP| 挂起进程
+|2 |SIGINT| 终止进程
+|3 |SIGQUIT| 停止进程
+|9 |SIGKILL| 无条件终止进程
+|15 |SIGTERM| 尽可能终止进程
+|17 |SIGSTOP| 无条件停止进程，但不是终止进程
+|18 |SIGTSTP| 停止或暂停进程，但不终止进程
+|19 |SIGCONT| 继续运行停止的进程
+
+当你要离开一个交互式 `shell` 时，它会将SIGHUP信号传给所有由该shell所启动的进程（包括正在运行的 shell 脚本）。
+
+`Ctrl+C` 组合键会生成 `SIGINT` 信号，并将其发送给当前在 `shell` 中运行的所有进程。
+
+`Ctrl+Z` 组合键会生成一个 `SIGTSTP` 信号，停止 `shell` 中运行的任何进程。
+
+```shell
+$ sleep 100
+^Z 
+[1]+ Stopped sleep 100
+```
+方括号中的数字是分配的作业号，每个进程称为作业，作业号是累加的，通过 `ps` 可以查看。
+
+```shell
+F S UID PID PPID C PRI NI ADDR SZ WCHAN TTY TIME CMD 
+0 S 501 2431 2430 0 80 0 - 27118 wait pts/0 00:00:00 bash 
+0 T 501 2456 2431 0 80 0 - 25227 signal pts/0 00:00:00 sleep 
+0 R 501 2458 2431 0 80 0 - 27034 - pts/0 00:00:00 ps
+```
+
+就可以用 `kill` 命令来发送一个 `SIGKILL` 信号来终止它。
+
+```shell
+$ kill -9 2456
+$ 
+[1]+ Killed sleep 100
+```
+
+### 2、捕获信号
+
+`trap` 命令允许你来指定 `shell` 脚本要监看并从 `shell` 中拦截的 Linux 信号。如果脚本收到了 `trap` 命令中列出的信号，该信号不再由 `shell` 处理，而是交由本地处理。
+
+```shell
+trap commands signals
+```
+
+简单例子，展示了如何使用 `trap` 命令来忽略 `SIGINT` 信号。
+
+```shell
+$ cat test.sh
+#!/bin/bash 
+ 
+trap "echo ' Sorry! I have trapped Ctrl-C'" SIGINT 
+
+echo This is a test script 
+ 
+count=1 
+while [ $count -le 10 ] 
+do 
+    echo "Loop #$count" 
+    sleep 1 
+    count=$[ $count + 1 ] 
+done 
+echo "This is the end of the test script"
+
+$ ./test.sh
+This is a test script 
+Loop #1 
+Loop #2 
+Loop #3 
+Loop #4 
+Loop #5 
+^C Sorry! I have trapped Ctrl-C 
+Loop #6 
+Loop #7 
+Loop #8 
+^C Sorry! I have trapped Ctrl-C 
+Loop #9 
+Loop #10 
+This is the end of the test script
+```
+
+除了在 shell 脚本中捕获信号，你也可以在 shell 脚本退出时进行捕获。
+
+```shell
+$ cat test.sh
+#!/bin/bash 
+
+trap "echo Goodbye..." EXIT 
+# 
+count=1 
+while [ $count -le 5 ] 
+do 
+ echo "Loop #$count" 
+ sleep 1 
+ count=$[ $count + 1 ] 
+done 
+ 
+$ ./test.sh
+Loop #1 
+Loop #2 
+Loop #3 
+Loop #4 
+Loop #5 
+Goodbye...
+```
+
+
 ## 推荐阅读：
 
 [《Linux命令行与shell脚本编程大全》](https://book.douban.com/subject/26854226/)

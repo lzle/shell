@@ -21,3 +21,10 @@ first line
 second line
 ```
 
+### 3、非交互修改账号密码
+
+```shell
+$ echo "baishancloud" | passwd --stdin root
+更改用户 root 的密码 。
+passwd：所有的身份验证令牌已经成功更新。
+```

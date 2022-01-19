@@ -11,19 +11,21 @@ Shell 是一个用 C 语言编写的程序，它是用户使用 Linux 的桥梁�
 
 三、[数组](#三数组)
 
-四、[流程控制](#四结构化命令)
+四、[字典](#四字典)
 
-五、[函数](#五函数)
+五、[流程控制](#五结构化命令)
 
-六、[运算符](#六运算符)
+六、[函数](#六函数)
 
-七、[用户参数](#七用户参数)
+七、[运算符](#七运算符)
 
-八、[输入/输出重定向](#七输入输出重定向)
+八、[用户参数](#八用户参数)
 
-九、[数学运算](#九数学运算)
+九、[输入/输出重定向](#九输入输出重定向)
 
-十、[控制脚本](#十控制脚本)
+十、[数学运算](#十数学运算)
+
+十一、[控制脚本](#十一控制脚本)
 
 ## 一、变量
 
@@ -306,7 +308,84 @@ lengthn=${#array_name[n]}
 
 注意：数组不可以进行切割，错误用法 `${array[1:2]}`。
 
-## 四、结构化命令
+## 三、字典
+
+`shell` 中的字典与数组有很多的相似之处，不过字典的下标可以不为整数。在使用字典时，需要先声明，否则结果可能与预期不同。
+
+### 1、 定义字典
+
+方式 1：
+```shell
+declare -A map
+map["my03"]="03"
+```
+
+方式 2：
+```shell
+declare -A map=(["my01"]="01" ["my02"]="02")
+map["my03"]="03"
+map["my04"]="04"
+```
+
+获取值：
+```shell
+declare -A map=(["sunjun"]="a" ["jason"]="b" ["lee"]="c")
+echo ${map["sunjun"]}
+
+# a
+```
+
+获取所有的值 key、value、长度。
+
+```shell
+#!/bin/bash
+
+declare -A map=(["sunjun"]="a" ["jason"]="b" ["lee"]="c")
+
+echo ${!map[@]}  # key
+echo ${map[@]}   # value
+echo ${#map[@]}  # length
+
+# sunjun lee jason
+# a c b
+# 3
+```
+
+### 2、 遍历字典
+
+遍历所有的 key 值。
+
+```shell
+#!/bin/bash
+
+declare -A map=(["sunjun"]="a" ["jason"]="b" ["lee"]="c")
+
+for key in ${!map[@]};do
+    echo $key
+done
+
+# sunjun
+# lee
+# jason
+```
+
+遍历所有的 value 值。
+
+```shell
+#!/bin/bash
+
+declare -A map=(["sunjun"]="a" ["jason"]="b" ["lee"]="c")
+
+for val in ${map[@]};do
+    echo $val
+done
+
+# a
+# c
+# b
+```
+
+## 五、结构化命令
 
 ### 1、 if 语句
 
@@ -750,7 +829,7 @@ done | sort
 # Tennessee
 ```
 
-## 五、函数
+## 六、函数
 
 ### 1、 函数定义
 
@@ -994,7 +1073,7 @@ echo $result
 # 15
 ```
 
-## 六、运算符
+## 七、运算符
 
 ### 1、算术运算符
 
@@ -1196,7 +1275,7 @@ fi
 # 返回 true
 ```
 
-## 七、用户参数
+## 八、用户参数
 
 `bash shell` 提供了一些不同的方法来从用户处获得数据，包括命令行参数、命令行选项以及直接从键盘读取输入的能力。
 
@@ -1416,7 +1495,7 @@ is your password really T3st1ng?
 $ cat test | while read line; do echo $line; done
 ```
 
-## 八、输入/输出重定向
+## 九、输入/输出重定向
 
 ### 1、 输出重定向
 
@@ -1489,7 +1568,7 @@ $ command < file1 >file2
 
 command 命令将 stdin 重定向到 file1，将 stdout 重定向到 file2。
 
-## 九、数学运算
+## 十、数学运算
 
 ### 1、expr 命令
 
@@ -1629,7 +1708,7 @@ echo The final answer for this mess is $var5
 # The final answer for this mess is 2813.9882
 ```
 
-## 十、控制脚本
+## 十一、控制脚本
 
 ### 1、处理信号
 

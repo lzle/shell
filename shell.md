@@ -308,7 +308,7 @@ lengthn=${#array_name[n]}
 
 注意：数组不可以进行切割，错误用法 `${array[1:2]}`。
 
-## 三、字典
+## 四、字典
 
 `shell` 中的字典与数组有很多的相似之处，不过字典的下标可以不为整数。在使用字典时，需要先声明，否则结果可能与预期不同。
 
@@ -327,12 +327,27 @@ map["my03"]="03"
 map["my04"]="04"
 ```
 
-获取值：
+获取指定 key 的值。
 ```shell
+#!/bin/bash
+
 declare -A map=(["sunjun"]="a" ["jason"]="b" ["lee"]="c")
 echo ${map["sunjun"]}
 
 # a
+```
+
+字典拼接扩展。
+
+```shell
+#!/bin/bash
+
+declare -A map=(["sunjun"]="a")
+map+=(["jason"]="b")
+
+echo ${!map[@]}
+
+# sunjun jason
 ```
 
 获取所有的值 key、value、长度。

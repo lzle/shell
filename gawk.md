@@ -1,6 +1,7 @@
 # Awk 编程
 
-`gawk` 提供一个类编程环境来修改和重新组织文件中的数据。
+`awk` 是贝尔实验室 1977 年搞出来的文本出现神器，之所以叫 `awk` 是因为其取了三位创始人 Alfred Aho，Peter Weinberger, 和 Brian Kernighan 的 Family Name 的首字符。
+它提供一个类编程环境来修改和重新组织文件中的数据。
 
 ## 目录
 
@@ -68,15 +69,16 @@ $
 
 ```shell
 $ echo "My name is Rich" | gawk '{$4="Christine"; print $0}'
+My name is Christine
 ```
 
 跟 `sed` 编辑器一样，`gawk` 编辑器允许将程序存储到文件中，然后再在命令行中引用。
 
 ```shell
-$ cat script2.gawk 
+$ cat script
 {print $1 "'s home directory is " $6} 
 
-$ gawk -F: -f script2.gawk /etc/passwd 
+$ gawk -F: -f script /etc/passwd 
 root's home directory is /root 
 bin's home directory is /bin
 ```
@@ -584,3 +586,9 @@ $ gawk -f funclib -f script data.txt
 2 20
 3 30
 ```
+
+## 推荐阅读：
+
+[《AWK 简明教程》](https://coolshell.cn/articles/9070.html)
+
+[《The AWK Programming Language》](https://book.douban.com/subject/1876898/)

@@ -28,3 +28,8 @@ $ echo "baishancloud" | passwd --stdin root
 更改用户 root 的密码 。
 passwd：所有的身份验证令牌已经成功更新。
 ```
+
+
+## 推荐阅读：
+
+[《应该知道的 LINUX 技巧》](https://coolshell.cn/articles/8883.html)

@@ -5,7 +5,7 @@
 ### 1、 多服务器批量执行命令
 
 ```shell
-$ cat do_ip_list | while read line; do echo $line; ip=$line; ssh -n -tt root@$ip hostname; done
+$ cat do_ip_list | while read line; do echo $line; ip=$line; ssh -n -tt -o StrictHostKeychecking=no root@$ip hostname; done
 ```
 
 ### 2、文件中写入长字符串

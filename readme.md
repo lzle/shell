@@ -27,6 +27,8 @@ second line
 $ echo "baishancloud" | passwd --stdin root
 更改用户 root 的密码 。
 passwd：所有的身份验证令牌已经成功更新。
+
+$ sshpass -p bsy@2022#bs8 ssh root@10.102.10.10 -o StrictHostKeychecking=no -o ConnectTimeout=5 -o PreferredAuthentications=password 'hostname'
 ```
 
 

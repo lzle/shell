@@ -31,6 +31,14 @@ passwd：所有的身份验证令牌已经成功更新。
 $ sshpass -p bsy@2022#bs8 ssh root@10.102.10.10 -o StrictHostKeychecking=no -o ConnectTimeout=5 -o PreferredAuthentications=password 'hostname'
 ```
 
+### 4、单行按照指定字符分割成多行输出
+
+```shell
+$ echo "10.103.10.33 10.103.10.17 10.103.10.138" |  awk -F" " '{for(i=1;i<=NF;i++) print $i}'
+10.103.10.33
+10.103.10.17
+10.103.10.138
+```
 
 ## 推荐阅读：
 

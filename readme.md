@@ -40,6 +40,17 @@ $ echo "10.103.10.33 10.103.10.17 10.103.10.138" |  awk -F" " '{for(i=1;i<=NF;i+
 10.103.10.138
 ```
 
+### 5、字符串切割
+
+```
+$ echo "every good" | awk '{print substr($1,1,1)}'    #returns e
+$ echo "every good" | awk '{print substr($1,3)}'     #returns ery
+$ echo "every good" | awk '{print substr($1,3)}'     #returns ery
+$ echo "every good" | awk '{print substr($2,3)}'     #returns od
+$ echo "every good" | awk '{print substr($0,7,2)}'   #returns go
+```
+
+
 ## 推荐阅读：
 
 [《应该知道的 LINUX 技巧》](https://coolshell.cn/articles/8883.html)

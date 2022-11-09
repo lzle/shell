@@ -50,6 +50,20 @@ $ echo "every good" | awk '{print substr($2,3)}'     #returns od
 $ echo "every good" | awk '{print substr($0,7,2)}'   #returns go
 ```
 
+### 6、根据时间统计次数
+
+```
+$ cat data.txt
+[09/Nov/2022:22:21:53
+[09/Nov/2022:22:21:53
+[09/Nov/2022:22:21:53
+[09/Nov/2022:22:22:04
+
+$ cat data.txt | awk '{++a[substr($1,1,length($1)-3)]}END{for( k in a ){print k, a[k]}}'
+[09/Nov/2022:22:21 3
+[09/Nov/2022:22:22 1
+```
+
 
 ## 推荐阅读：
 

@@ -64,6 +64,16 @@ $ cat data.txt | awk '{++a[substr($1,1,length($1)-3)]}END{for( k in a ){print k,
 [09/Nov/2022:22:22 1
 ```
 
+### 7、对Json数据进行格式化输出
+
+```
+$ echo '{"name":"John","age":30,"city":"New York"}' | python -m json.tool
+{
+    "name": "John",
+    "age": 30,
+    "city": "New York"
+}
+```
 
 ## 推荐阅读：
 

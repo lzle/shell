@@ -79,9 +79,9 @@ $ echo '{"name":"John","age":30,"city":"New York"}' | python -m json.tool
 ### 8、配置ulimit文件描述符限制10240
 
 ```
-sudo su -
+sudo su -;
 
-ulimit -n 102400
+ulimit -n 102400;
 
 echo "# /etc/security/limits.conf
 #
@@ -151,8 +151,14 @@ echo "# /etc/security/limits.conf
 * soft memlock unlimited
 * hard memlock unlimited
 " > /etc/security/limits.conf
-```
 
+echo "
+* soft nofile 102400
+* hard nofile 102400
+* soft nproc 102400
+* hard nproc 102400
+" > /etc/security/limits.d/95-nofile.conf
+```
 
 ## 推荐阅读：
 

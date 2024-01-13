@@ -160,6 +160,15 @@ echo "
 " > /etc/security/limits.d/95-nofile.conf
 ```
 
+### 9、获取 HTTP 建立连接、请求总时间、状态码等信息
+
+```shell
+for i in $(seq 1 10); do
+	curl -w "Iteration $i\nHTTP status code: %{http_code}\nConnect time: %{time_connect} seconds\nTime to first byte: %{time_starttransfer} seconds\nTotal time: %{time_total} seconds\nDownload size: %{size_download} bytes\n" -o /dev/null -s http://ss.bscstorage.com
+done
+```
+
+
 ## 推荐阅读：
 
 [《应该知道的 LINUX 技巧》](https://coolshell.cn/articles/8883.html)

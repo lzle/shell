@@ -156,6 +156,67 @@ $ curl -c cookies http://ss.bscstorage.com
 $ curl -b cookies http://ss.bscstorage.com
 ```
 
+### 10、x-header-trace:all
+
+```
+$ curl -vo /dev/null  -H 'x-header-trace:all'  http://heroclient.jumpwgame.com/xclient_unpack/fightmap/art/loading.png
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying 112.29.218.144...
+* TCP_NODELAY set
+* Connected to heroclient.jumpwgame.com (112.29.218.144) port 80 (#0)
+> GET /xclient_unpack/fightmap/art/loading.png HTTP/1.1
+> Host: heroclient.jumpwgame.com
+> User-Agent: curl/7.64.1
+> Accept: */*
+> x-header-trace:all
+>
+< HTTP/1.1 200 OK
+< Date: Wed, 20 Mar 2024 08:56:45 GMT
+< Content-Type: image/png
+< Content-Length: 301066
+< Connection: keep-alive
+< Server: openresty/1.13.6.3
+< x-amz-request-id: 4d27da56-2403-2016-3933-e8611f1b288f
+< x-amz-s2-requester: GRPS000000ANONYMOUSE
+< Last-Modified: Thu, 14 Mar 2024 17:20:51 GMT
+< ETag: "2df094933ed354800007c9af42e81e14"
+< x-amz-meta-s2-size: 301066
+< Cache-Control: max-age=31536000
+< Accept-Ranges: bytes
+< X-Ser: BC145_, BC144_
+< X-Refresh-Pattern: -i \.(swf|jpg|jpeg|gif|png|webp|bmp|ico)(\?|$) 1440 100% 1440 override-lastmod ignore-reload
+< X-Swap-File: /ssd3/cache0/cache1/00/01/000001C1
+< X-Channel-Name: heroclient.jumpwgame.com
+< X-Traffic-Domain: heroclient.jumpwgame.com
+< X-Store-Url: http://heroclient.jumpwgame.com/xclient_unpack/fightmap/art/loading.png
+< X-Local-Addr: 112.29.218.144:18002
+< X-Upstream-Addr: -
+< X-Upstream-Status: -
+< X-Upstream-Host: -
+< X-Upstream-Url: -
+< X-Upstream-Conn: -
+< X-Antileech-Msg: -
+< X-Uncachable-reason: -
+< X-Store-Complete: YES
+< X-First-Use: -
+< X-Upstream-Name: -
+< X-Upstream-Is-Parent: -
+< X-Forward-Local-Port: 0
+< X-Forward-Dst-Ip: -
+< Bs-Internal-Hitstatus: TCP_HIT
+< Bs-Hierarchy-Status: NONE
+< X-Internal-Error: -
+< X-Reason-403: -
+< X-Internal-Details: -
+<
+{ [3142 bytes data]
+100  294k  100  294k    0     0  1872k      0 --:--:-- --:--:-- --:--:-- 1860k
+* Connection #0 to host heroclient.jumpwgame.com left intact
+* Closing connection 0
+```
+
+
 ## 二、参数使用
 
 ### 1、-A

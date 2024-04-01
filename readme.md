@@ -168,6 +168,14 @@ for i in $(seq 1 10); do
 done
 ```
 
+#### 10、每间隔 2 秒执行一次
+
+```shell
+$ watch -n 2 ceph -s
+```
+
+
+
 
 ## 推荐阅读：
 

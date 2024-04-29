@@ -174,7 +174,13 @@ done
 $ watch -n 2 ceph -s
 ```
 
+#### 切换用户，使用用户权限
 
+```
+sudo su -
+sudo su - hadoop 
+sudo -u hadoop /opt/hadoop/bin/hdfs dfs -ls /
+```
 
 
 ## 推荐阅读：

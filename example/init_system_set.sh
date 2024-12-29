@@ -13,9 +13,9 @@ sed -i '/Port 10022/a Port 22' /etc/ssh/sshd_config
 sed -i 's/PermitRootLogin no/PermitRootLogin yes/g' /etc/ssh/sshd_config && systemctl reload sshd
 
 # 3、修改密码
-echo  bsy@2022#bs8 | passwd --stdin root
+echo  3vr8y@@APBg3 | passwd --stdin root
 
 # 4、设置ipmi密码
 ipmi_root_id=$(ipmitool user list 1 2>/dev/null | grep root | awk '{print $1}')
-ipmi_passwd=bsy@2022#bs8
+ipmi_passwd=3vr8y@@APBg3
 ipmitool user set password $ipmi_root_id "$ipmi_passwd"

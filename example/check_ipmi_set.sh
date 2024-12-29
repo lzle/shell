@@ -64,53 +64,28 @@ warn()
     local Yellow="$(tput bold; tput setaf 3)"
     _LOG_LEVEL="  WARN" log "${Yellow}" "$@"
 }
+
 err() {
-    # 设置前景色 red
     local Red="$(tput setaf 1)"
     _LOG_LEVEL=" ERROR" log "${Red}" "$@"
 }
 
 
-setup_ipmi()
+check_ipmi()
 {
-    info "setup ipmi"
-    channel_id=1
+    info "setup ipmi host_ip $inn_ip idc_name $idc_name"
 
     if [[ "${idc_name}" == '.shijiazhuang.xunjie' || "${idc_name}" == '.ningbo.yinzhou' ]]; then
         ipmi_ip=$(echo "$inn_ip" | awk '{split($0,arr,".");ipmi_ip=sprintf("%d.%d.%d.%d",arr[1],arr[2],arr[3]+32,arr[4]);print ipmi_ip}')
-        ipmi_netmask='255.255.224.0'
-        ipmi_gateway=$(echo "$inn_ip" | awk '{split($0,arr,".");ipmi_gateway=sprintf("%d.%d.%d.%d",arr[1],arr[2],32,1);print ipmi_gateway}')
     elif [[ "${idc_name}" == '.anhui.huinan' || "${idc_name}" == '.shijiazhuang.changshan' || "${idc_name}" == '.shijiazhuang.xiangyang' ]]; then
         ipmi_ip=$(echo "$inn_ip" | awk '{split($0,arr,".");ipmi_ip=sprintf("%d.%d.%d.%d",arr[1],arr[2],arr[3]+128,arr[4]);print ipmi_ip}')
-        ipmi_netmask='255.255.192.0'
-        ipmi_gateway=$(echo "$inn_ip" | awk '{split($0,arr,".");ipmi_gateway=sprintf("%d.%d.%d.%d",arr[1],arr[2],128,1);print ipmi_gateway}')
     else
         ipmi_ip=$(echo "$inn_ip" | awk '{split($0,arr,".");ipmi_ip=sprintf("%d.%d.%d.%d",arr[1],arr[2],arr[3]+32,arr[4]);print ipmi_ip}')
-        ipmi_netmask='255.255.224.0'
-        ipmi_gateway=$(echo "$inn_ip" | awk '{split($0,arr,".");ipmi_gateway=sprintf("%d.%d.%d.%d",arr[1],arr[2],32,1);print ipmi_gateway}')
     fi
 
-    ipmitool -I open sensor  >/dev/null 2>&1 || die "open sensor error"
-    ipmitool -I open lan set "$channel_id" ipsrc static  >/dev/null 2>&1 || die "set ipsrc static error"
-    # ipmitool -I open lan set "$channel_id" user >/dev/null 2>&1 || die "set $channel_id user error"
-    ipmitool -I open lan set "$channel_id" access on  >/dev/null 2>&1 || die "set $channel_id access on error"
+    info "check ipmi ip_addr $ipmi_ip"
 
-    ipmitool lan set "$channel_id" ipaddr "$ipmi_ip" >/dev/null 2>&1 || die "set ipmi ip error"
-    ipmitool lan set "$channel_id" netmask "$ipmi_netmask" >/dev/null 2>&1 || die "set netmask error"
-    ipmitool lan set "$channel_id" defgw ipaddr "$ipmi_gateway" >/dev/null 2>&1 || die "set defgw error"
-
-    ping -c 3 -i 0.2 -W 3 "$ipmi_ip" >/dev/null 2>&1  || die "ipmi ip $ipmi_ip is unreachable"
-
-    ipmi_root_id=$(ipmitool user list 1 2>/dev/null | grep root | awk '{print $1}')
-
-    if [ -z "$ipmi_root_id" ];then
-        ipmi_root_id=2
-    fi
-
-    ipmitool channel setaccess "$channel_id" "$ipmi_root_id" callin=on ipmi=on link=on privilege=4 \
-                                >/dev/null 2>&1 || die "set ipmi channel access error"
-    ipmitool -I open user set name "$ipmi_root_id" root >/dev/null 2>&1 || die "set ipmi root name error"
-    ipmitool user set password "$ipmi_root_id" "$ipmi_passwd" >/dev/null 2>&1 || die "set ipmi root passwd error"
+    ipmitool -H $ipmi_ip -I lanplus -U root -P $ipmi_passwd power status ||  die "check ipmi set error"
 
     ok "ipmi setup successfully"
 }
@@ -145,12 +120,12 @@ fi
 
 ipmi_passwd=$password
 
+ok "start check"
 
-ok "start setup items"
+check_ipmi
 
-setup_ipmi
+ok "check finish"
 
-ok "setup all items successfully"
-
-
-
+# 功能
+# 1、设置 ipmi 地址
+# 2、设置 ipmi 密码

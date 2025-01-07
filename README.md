@@ -8,6 +8,7 @@
     * [非交互修改账号密码](#非交互修改账号密码)
     * [对Json数据进行格式化输出](#对Json数据进行格式化输出)
     * [find 结果批量执行](#find-结果批量执行)
+    * [xargs 命令使用](#xargs-命令使用)
 
 * [脚本](#脚本)
     * [文件中写入长字符串](#文件中写入长字符串)
@@ -73,6 +74,64 @@ $ echo '{"name":"John","age":30,"city":"New York"}' | python -m json.tool
 find . -type f -exec echo {} + 
 
 find /path/to/dir -name "*.tmp" -exec rm {} \;
+```
+
+### xargs 命令使用
+
+xargs 命令的常用选项：
+
+* -0：由空字符(null)分隔，而不是空白字符(whitespace)。禁用引号和反斜杠处理。
+* -a：从文件读取参数，而非标准输入。
+* -d：指定分隔符，缺省为空白符：空格、换行等。
+* -E：设置“文件结束符”。在处理标准输入时，如果遇到“文件结束符”，则其后的所有输入都将被忽略。
+* -i：参数替换，用从标准输入读取的参数替换 initial arguments 中的内容{}；如果需要指定非{}，则使用-I（i的大写）选项指定。
+* -n：指定每个命令行参数的个数。
+* -P：指定并行执行的最大进程数。
+* -p：执行命令前提示用户确认。
+* -r：忽略无法执行的命令。
+* -s：限制命令及参数总字符数。
+* -t：在执行命令之前先打印命令。
+* -x：用于确保xargs在命令行长度（-s选项指定）超出限制时停止执行。
+
+拷贝 100 天前的文件到指定目录
+
+```shell
+find /root/baishan/s2-init/script/ -type f -mtime +100 | xargs -i cp {} /opt/pbx/tmp/
+```
+
+处理文件名中包含空格的情况
+
+```shell
+find /path/to/dir -name "*.tmp" -print0 | xargs -0 rm
+```
+
+指定分隔符
+
+```shell
+echo "file1;file2;file3" | xargs -d ";" echo
+file1 file2 file3
+
+echo "file1;file2;file3" | xargs -d ";" -n 1
+file1
+file2
+file3
+```
+
+批量执行命令
+
+```shell
+find . -name "*.txt" -print | xargs -I {} sh -c 'cp {} {}.backup; mv {} new_location/'
+```
+
+指定每行输出个数
+
+```shell
+echo {0..9} | xargs -n 2 echo
+0 1
+2 3
+4 5
+6 7
+8 9
 ```
 
 ## 脚本
@@ -212,3 +271,4 @@ $ awk '{sum += $2} END {print sum}' output.txt
 ## 推荐阅读：
 
 [《应该知道的 LINUX 技巧》](https://coolshell.cn/articles/8883.html)
+[《xargs 命令教程》](https://www.ruanyifeng.com/blog/2019/08/xargs-tutorial.html)

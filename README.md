@@ -9,6 +9,7 @@
     * [对Json数据进行格式化输出](#对Json数据进行格式化输出)
     * [find 结果批量执行](#find-结果批量执行)
     * [xargs 命令使用](#xargs-命令使用)
+    * [grep 命令使用](#grep-命令使用)
 
 * [脚本](#脚本)
     * [文件中写入长字符串](#文件中写入长字符串)
@@ -108,7 +109,7 @@ find /path/to/dir -name "*.tmp" -print0 | xargs -0 rm
 指定分隔符
 
 ```shell
-echo "file1;file2;file3" | xargs -d ";" echo
+echo "file1;file2;file3" | xargs -d ";"
 file1 file2 file3
 
 echo "file1;file2;file3" | xargs -d ";" -n 1
@@ -132,6 +133,42 @@ echo {0..9} | xargs -n 2 echo
 4 5
 6 7
 8 9
+```
+
+### grep 命令使用
+
+匹配文本中的数字行
+
+```shell
+$ cat numfile
+915492083
+7
+650
+44197
+309562834710
+28
+96740531289
+153
+7048392
+```
+
+通用匹配
+
+```shell
+$ grep -E '[0-9]{9}' numfile
+915492083
+309562834710
+96740531289
+```
+
+精确匹配
+
+```shell
+$ grep -E '^[0-9]{9}$' numfile
+915492083
+
+$ grep -E '\b[0-9]{9}\b' numfile
+915492083
 ```
 
 ## 脚本
